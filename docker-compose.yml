@@ -33,7 +33,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_JMX_PORT: 9101
-      KAFKA_JMX_HOSTNAME: 3.141.28.175
+      KAFKA_JMX_HOSTNAME: localhost
       KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
@@ -167,49 +167,3 @@ services:
       KAFKA_REST_BOOTSTRAP_SERVERS: 'broker:29092'
       KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
       KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
-
-  elasticsearch:
-      image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.0
-      container_name: elasticsearch
-      #restart: always
-      healthcheck:
-        start_period: 10s
-        interval: 10s
-        retries: 20
-        test: curl -s http://localhost:9200/_cluster/health | grep -vq '"status":"red"'
-      ports:
-        - 9200:9200
-        - 9300:9300
-      environment:
-        discovery.type: "single-node"
-        ES_JAVA_OPTS: "-Xms1g -Xmx1g"
-        cluster.name: "elasticsearch-cp-demo"
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.10.0
-    container_name: kibana
-    restart: always
-    healthcheck:
-      interval: 10s
-      retries: 20
-      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://kibana:5601/api/status || exit 1
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    ports:
-      - 5601:5601
-    environment:
-      NEWSFEED_ENABLED: 'false'
-      TELEMETRY_OPTIN: 'false'
-      TELEMETRY_ENABLED: 'false'
-      SERVER_MAXPAYLOADBYTES: 4194304
-      KIBANA_AUTOCOMPLETETIMEOUT: 3000
-      KIBANA_AUTOCOMPLETETERMINATEAFTER: 2500000
-
-  oracle:
-        image: oracle/database:18.4.0-xe
-        container_name: oracle-xe
-        ports:
-            - "11521:1521"
-        environment:
-            - ORACLE_PWD=oracle

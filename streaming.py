@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-import tweepy #.streaming import StreamListener
+#import tweepy #.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream,API
 from kafka import KafkaProducer
@@ -7,7 +7,7 @@ import json
 import yaml
 from datetime import datetime, timedelta
 import time
-import pickle
+#import pickle   
 
 def do_login():
     with open('config.yaml') as file:
@@ -37,29 +37,23 @@ def normalize_timestamp(time):
     return (mytime.strftime("%Y-%m-%d %H:%M:%S")) 
 
 def get_twitter_data():
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
+    producer = KafkaProducer(bootstrap_servers='localhost:9092', value_serializer=lambda v: json.dumps(v).encode('utf-8'))
     topic_name = 'apple-tweets'
     api = do_login()
-    rec = []
     print(" ")
     print("Now collecting tweets ............ ")
     res = api.search_tweets("Apple OR iphone OR iPhone")
     for i in res:
-        record = ''
-        record += str('user:' + i.user.id_str)
-        record += ' '
-        #record += str('time:' + normalize_timestamp(str(i.created_at)))
-        #record += ' '
-        record += str('number_of_follower:'+ str(i.user.followers_count))
-        record += ' '
-        record += str('location:'+ i.user.location)
-        record += ' '
-        record += str('nubmer_of_time_retweeted:'+ str(i.retweet_count))
-        record += ' '
-        rec.append(record)
-        serialized_rec = pickle.dumps(rec)
-        producer.send(topic_name, serialized_rec)
-        rec = []
+        
+        user =  str(i.user.id_str)
+        number_of_follower = str(i.user.followers_count)
+        location = str(i.user.location)
+        nubmer_of_time_retweeted = str(i.retweet_count)
+
+        # Create a dictionary record
+        record = {'user':user,'number_of_follower':number_of_follower,'location': location,                      'nubmer_of_time_retweeted':nubmer_of_time_retweeted}
+        # send record to kakfka
+        producer.send(topic_name, record)
              
 def periodic_work(interval):
     while True:
