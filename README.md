@@ -7,7 +7,7 @@ Else on mac run brew install:  brew install python@3.8
 
 From terminal, type:  git clone https://github.com/frankfurtmacmoses/kafka-learning.git
 
-followed by:  git checkout version-3.0
+followed by:  git checkout version-3.0  OR git switch version-3.0
 
 type: python3.8 -m venv venv
 
