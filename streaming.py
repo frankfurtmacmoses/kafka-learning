@@ -38,20 +38,22 @@ def normalize_timestamp(time):
 
 def get_twitter_data():
     producer = KafkaProducer(bootstrap_servers='localhost:9092', value_serializer=lambda v: json.dumps(v).encode('utf-8'))
-    topic_name = 'apple-tweets'
+    topic_name = 'appletopics'
     api = do_login()
     print(" ")
     print("Now collecting tweets ............ ")
     res = api.search_tweets("Apple OR iphone OR iPhone")
     for i in res:
         
-        user =  str(i.user.id_str)
+        user_id =  str(i.user.id_str)
+        user_name = str(i.user.name)
         number_of_follower = str(i.user.followers_count)
         location = str(i.user.location)
         nubmer_of_time_retweeted = str(i.retweet_count)
+        created_at = str(i.user.created_at)
 
         # Create a dictionary record
-        record = {'user':user,'number_of_follower':number_of_follower,'location': location,                      'nubmer_of_time_retweeted':nubmer_of_time_retweeted}
+        record = {'user':user_id,'user_name':user_name, 'number_of_follower':number_of_follower,'location': location, 'nubmer_of_time_retweeted':nubmer_of_time_retweeted,'created_at':created_at}
         # send record to kakfka
         producer.send(topic_name, record)
              

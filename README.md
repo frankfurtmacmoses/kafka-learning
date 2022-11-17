@@ -15,7 +15,7 @@ on mac whe, type source/venv/bin/activate
 
 type pip install -r requirements.txt
 
-Navigate to home-directory of cloned repo
+Navigate to home-directory of cloned repocle
 
 type: docker-compose up -d
 
@@ -32,9 +32,37 @@ docker exec -it ksqldb-cli ksql http://ksqldb-server:8088
 
  ksql http://localhost:8088
 
-From ksql prompt, type as it is:   print 'apple-tweets'    
+From ksql prompt, type as it is:   print 'appletopics'    
 
 To desplay output in a well formatted way : 
+
+create  stream appletopics_st(
+user_id VARCHAR ,
+user_name VARCHAR,
+number_of_follower VARCHAR,
+location VARCHAR,
+nubmer_of_time_retweeted VARCHAR
+)
+WITH(
+    KAFKA_TOPIC ='appletopics',
+    VALUE_FORMAT = 'JSON' 
+);
+
+
+
+select * 
+from appletopics_st
+emit changes;
+
+
+SET 'auto.offset.reset' = 'earliest';
+
+select * 
+from appletopics_st 
+emit changes;
+
+
+
 
 
 To kill the processes press Control + C 
